@@ -30,6 +30,8 @@ get_geocode(address, suburb, api_key) = HTTP.get(generate_geocode_uri(address, s
 
 Takes a street address and a suburb, and returns a `Tuple` (Latitude, Longitude) of that house's coordinates - as per Google's Geocoding API. It assumes the house is in Victoria, Australia.
 
+Note that this is (I believe) synchronous.
+
 # Examples
 ```jldoctest
 julia>get_coordinates("85 studley st", "abbotsford", "ImaginaryAPIKey")
