@@ -6,7 +6,7 @@ include("coordinates.jl")
 # All relevant filenames
 LESS_FILE = "MELBOURNE_HOUSE_PRICES_LESS.csv"
 FULL_FILE = "Melbourne_housing_FULL.csv"
-FULL_FILLED_FILE_PROCESSED = "Melbourne_housing_FULL_processed.csv"
+FULL_FILE_PROCESSED = "Melbourne_housing_FULL_processed.csv"
 
 # Set to true if current processed files need to be overwritten or don't exist
 OVERWRITE_PROCESSED = false
@@ -49,12 +49,12 @@ x = combine(groupby(df, [:Suburb]), nrow => :count)
 
 y = filter(row -> row.count == 1, x)
 
-@show(y)
+@debug y
 
 x_1 = combine(groupby(df_init, [:Regionname]), nrow => :count)
 y_1 = filter(row -> row.count == 1, x_1)
 
-@show(y_1)
+@debug y_1
 
 """
     find_missing_subset(dataframe::AbstractDataFrame, columns::Symbol=:)::DataFrame
@@ -94,12 +94,12 @@ function get_block_of_missing_coords(df::AbstractDataFrame, to_edit::Bool, block
     return missing_df[vcat(max(nrow(missing_df) - block_size, 0) |> trues, min(block_size, nrow(missing_df)) |> falses) .⊻ to_edit, :]
 end
 
-OVERWRITE_PROCESSED && CSV.write(FULL_FILLED_FILE, df_full)
+(OVERWRITE_PROCESSED || !isfile(FULL_FILE_PROCESSED)) && CSV.write(FULL_FILE_PROCESSED, df_full)
 
 # Loop through our missing coordinates and fill them in chunk-by-chunk. Writes to the file and reads from it once each loop.
 while true
     # Read a fresh DataFrame from the file (slow, but saves on API calls in case of error)
-    df_filled = DataFrame(CSV.File(FULL_FILLED_FILE_PROCESSED))
+    df_filled = DataFrame(CSV.File(FULL_FILE_PROCESSED))
 
     # Populate the missing set we won't touch, and the one we will
     missing_coords_yesedit = get_block_of_missing_coords(df_filled, true)
@@ -131,5 +131,5 @@ while true
     end
 
     # Overwrite the file
-    CSV.write(FULL_FILLED_FILE_PROCESSED, filled_df)
+    CSV.write(FULL_FILE_PROCESSED, filled_df)
 end
