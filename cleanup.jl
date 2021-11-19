@@ -10,7 +10,7 @@ const FULL_FILE = joinpath("data", "Melbourne_housing_FULL_processed.csv")
 const FULL_FILE_PROCESSED = joinpath("data","Melbourne_housing_FULL_processed_2.csv")
 
 # Set to true if current processed files need to be overwritten
-const OVERWRITE_PROCESSED = false
+const OVERWRITE_PROCESSED = true
 
 # Set to true if we must overwrite the coordinates
 const OVERWRITE_COORDINATES = false
@@ -45,11 +45,11 @@ Returns a copy of the given `DataFrame`, where the (`String``) data in each of t
 """
 consolidate_string_case(df::AbstractDataFrame, cols=[:Suburb, :Address, :Regionname, :CouncilArea])::DataFrame = transform(df, [col => ByRow(x -> uppercasewordfirst(x)) => col for col in cols]...)
 
-replace_missing_data(df::AbstractDataFrame, cols=[:Distance]) = transform(df, [col => ByRow(x -> if (x == "#N/A") missing else parse(Float16, x) end) => col for col in cols]...)
+replace_na_w_missing(df::AbstractDataFrame, cols=[:Distance, :Postcode, :CouncilArea, :Regionname]) = transform(df, [col => ByRow(x -> if (x |> uppercase == "#N/A") missing else x end) => col for col in cols]...)
 
 df_less = DataFrame(CSV.File(LESS_FILE)) |> consolidate_string_case
 
-df_full = DataFrame(CSV.File(FULL_FILE)) |> consolidate_string_case |> fix_coordinate_typos
+df_full = DataFrame(CSV.File(FULL_FILE)) |> consolidate_string_case |> fix_coordinate_typos |> replace_na_w_missing
 
 x = combine(groupby(df_less, [:Suburb]), nrow => :count)
 
@@ -115,6 +115,7 @@ no_file_message(type::String) = "Could not find $(type) file. Creating new."
 (OVERWRITE_PROCESSED || !isfile(LESS_FILE_PROCESSED)) && CSV.write(LESS_FILE_PROCESSED, df_less)
 
 # Loop through our missing coordinates and fill them in chunk-by-chunk. Writes to the file and reads from it once each loop.
+OVERWRITE_COORDINATES && @warn "About to make a whole lotta API calls, watch out"
 while OVERWRITE_COORDINATES
     # Read a fresh DataFrame from the file (slow, but saves on API calls in case of error)
     df_filled = DataFrame(CSV.File(FULL_FILE_PROCESSED))
