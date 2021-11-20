@@ -71,7 +71,7 @@ function plot_time_type(df::AbstractDataFrame)
 
     count_dates(df) = combine(groupby(df, :Date), :Type => x->count((a->a=="h"), x) / length(x))
 
-    @show df_time_type_all = df_time_type |> count_dates
+    df_time_type_all = df_time_type |> count_dates
 
     xticks_range = DateTime(2016, 2):Dates.Month(4):DateTime(2018, 3)
     xticks=(xticks_range, [Dates.format(tick, "yyyy-mm") for tick in xticks_range])

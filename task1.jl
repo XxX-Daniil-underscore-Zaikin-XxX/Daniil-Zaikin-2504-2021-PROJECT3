@@ -1,4 +1,4 @@
-import DataFrames
+using DataFrames
 using Plots
 using CSV
 using StatsPlots
@@ -108,7 +108,7 @@ function plot_landsize(df_full::AbstractDataFrame)
     # Function to convert axes from log10 to what they should be
     adjustment_func(num::Int) = convert(Int, 10^(num / 10.0) |> floor)
 
-    # X-Axis won't be 100% accurate, but the difference would be too minute to matter
+    # X-Axis won't be 100% accurate, be difference would be too minute to matter
     return @df df_landsize plot(:Landsize_Grouped, :count, seriestype = :line, xticks=(10:10:56, adjustment_func.(10:10:56)), label="", tickfonthalign=:center, xlabel="Landsize (m²)", ylabel="Number of Properties", plot_title="Property Landsizes")
 end
 
@@ -129,4 +129,4 @@ function save_plots(tasknum::Int, df_creator::Function;plot_funcs::Vector{Functi
     for (i, func) in enumerate(plot_funcs)
         savefig(func(df), "output/task$(tasknum).$(i).png")
     end
-end
+end;
