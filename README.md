@@ -15,8 +15,12 @@ For Task 1, you must first run the following:
 
 If you are using a different file for your data, you can pass its name as a parameter in `generate_task1_df`.
 
-You can then run each chart of the task as follows:
+You can then grab each chart of the task as follows:
 
 ```julia
-    plot_rooms(df_full)
+    chart1 = plot_rooms(df_full)
+    chart2 = plot_price(df_full)
+    chart3 = plot_distance(df_full)
+    chart4 = plot_method(df_full)
+    chart5 = plot_landsize(df_full)
 ```
