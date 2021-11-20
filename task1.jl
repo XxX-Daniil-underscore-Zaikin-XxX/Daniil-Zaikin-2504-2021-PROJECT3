@@ -74,7 +74,7 @@ Plots distribution of price as a distance sum line.
 X = distance (km), Y = number of propetries that are further from the CBD than that distance; Y is in linear scale.
 """
 function plot_distance(df_full::AbstractDataFrame)
-    df_distance = prepare_cumplot(transform(df_full |> dropmissing, :Distance => ByRow(x->parse(Float16, x)) => :Distance), :Distance)
+    df_distance = prepare_cumplot(transform(df_full |> dropmissing, :Distance => ByRow(x->x isa String ? parse(Float16, x) : x) => :Distance), :Distance)
 
     # We will use a cumulative plot. It feels appropriate, considering we are using continuous data of a large volume.
     return @df df_distance plot(:Distance, :cum_rownum, xticks=0:10:50, yformatter = :plain, label="", xlabel="Distance From CBD (km)", ylabel="Num. of Properties Further From CBD", plot_title="Cumulative CBD Distance")
@@ -118,3 +118,15 @@ end
 Generates a `DataFrame` from a CSV file for use throughout this task.
 """
 generate_task1_df(filename=FULL_FILE_PROCESSED) = DataFrame(CSV.File(filename))
+
+"""
+    save_plots(tasknum::Int, df_creator::Function;plot_funcs::Vector{Function}, filename=FULL_FILE_PROCESSED)
+
+Given a task number, a `DataFrame` generator `Function` that takes a file name as a parameter, and a `Vector` of `Functions` which take this `DataFrame` and output `Plot`s, this function saves all such `Plot`s as appropriately named .png files in the output directory.
+"""
+function save_plots(tasknum::Int, df_creator::Function;plot_funcs::Vector{Function}, filename=FULL_FILE_PROCESSED)
+    df = df_creator(filename)
+    for (i, func) in enumerate(plot_funcs)
+        savefig(func(df), "output/task$(tasknum).$(i).png")
+    end
+end

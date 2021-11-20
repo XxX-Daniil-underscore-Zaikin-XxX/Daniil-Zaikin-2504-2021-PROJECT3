@@ -2,7 +2,9 @@
 
 Good evening. My name is Dan Zaikin, and this is [Project 3](https://courses.smp.uq.edu.au/MATH2504/assessment_html/project3.html).
 
-This code includes both the original and processed data, but should you wish to process your own set, you can do so by running `cleanup.jl`. Note that it includes `info`, `debug`, and `error` messages; you can enable or disable them as per standard Julia fare.
+This code includes both the original and processed data, but should you wish to process your own set, you can do so by running `cleanup.jl` (and editing the global constants as necessary). Note that it includes `info`, `debug`, and `error` messages; you can enable or disable them as per standard Julia fare.
+
+For each task involving charts, `save_plots` happens to be useful for converting a set of plot-generating functions into image files.
 
 ## Task 1
 
@@ -42,6 +44,23 @@ You can then grab each chart of the task as follows:
     chart1 = plot_rooms_price(df_full)
     chart2 = plot_distance_price(df_full)
     chart3 = plot_rooms_distance_price(df_full)
+```
+
+## Task 3
+
+As with the previous two tasks, run the following:
+
+```julia
+    include("task3.jl")
+    df_full = generate_task3_df()
+```
+
+Next, you can get each chart as follows:
+
+```julia
+    chart1 = plot_time_sales(df_full)
+    chart2 = plot_time_price(df_full)
+    chart3 = plot_time_type(df_full)
 ```
 
 ## Task 4

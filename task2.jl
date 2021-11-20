@@ -19,7 +19,7 @@ Takes a number, returns it as a string in currency (\$AUD) form. Taken from [her
 julia>a = 10000
 10000
 julia>currency_format(a)
-$10,000
+\$10,000
 ```
 """
 currency_format(num)::String = "\$" * replace(num |> string, r"(?<=[0-9])(?=(?:[0-9]{3})+(?![0-9]))" => ",")
