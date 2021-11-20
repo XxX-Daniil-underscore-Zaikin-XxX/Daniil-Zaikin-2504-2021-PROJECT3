@@ -60,21 +60,39 @@ function create_postcode_dict_all(df_pc::AbstractDataFrame, cols)::Dict{Set, Dic
     return final_dict
 end
 
-dic_1 = create_postcode_dict_for_cols(df_pc, [:Suburb])
-dic_2 = create_postcode_dict_for_cols(df_pc, [:CouncilArea, :Suburb])
+@debug "Testing single-value `Dict` creation." create_postcode_dict_for_cols(df_pc, [:Suburb])
+@debug "Testing multi-value `Dict` creation." create_postcode_dict_for_cols(df_pc, [:CouncilArea, :Suburb])
 
 beeg_dict = create_postcode_dict_all(df_pc, [:CouncilArea, :Suburb, :Regionname])
 
 """
-Pass in the beeg dict and a list of tuples. This list should be (:Column, data).
+    get_postcode(beeg_dict::AbstractDict{AbstractSet, AbstractDict{AbstractSet{String}, AbstractVector{Tuple{Int, Float32}}}};kwargs...)::Vector{Tuple{Int, Float32}}
+
+Takes a `Dict` formatted as per `create_postcode_dict_all` and any number of columns to search (as well as the data to search for), and returns a `Vector` of `Tuples` of possible postcodes and the likelihood of their match.
+
+To clarify the permitted `Dict` data structure:
+```
+                                                              Matching Postcode
+                                                             ↗
+Set(Col. Names) → Set(Search Data) → Vector of [ Tuples w/ ( ) ]
+                                                             ↘
+                                                              Match likelihood  
+```
+
 """
-function get_postcode(beeg_dict::AbstractDict{AbstractSet, AbstractDict{AbstractSet{String}, AbstractVector{Tuple{Int, Float32}}}};kwargs...)
+function get_postcode(beeg_dict::AbstractDict{AbstractSet, AbstractDict{AbstractSet{String}, AbstractVector{Tuple{Int, Float32}}}};kwargs...)::Vector{Tuple{Int, Float32}}
     # Takes Vector of Tuples, returns a Vector of only the values in each tuple's tup_ind 
     slice_tuple(tup_vec, tup_ind) = Set(tup[tup_ind] for tup in tup_vec)
     return collect(beeg_dict[slice_tuple(kwargs, 1)][slice_tuple(kwargs, 2)])
 end
 
-get_postcode(beeg_dict, Suburb="Rosanna", CouncilArea="Banyule City Council")
-# println(dic_2)
-# print(dic_1["Taylors Lakes"])
-# println(keys(dic_2))
+"""
+    generate_dict_from_file(filename=FULL_FILE_PROCESSED, cols=[:CouncilArea, :Suburb, :Regionname])
+
+Takes the filename (`String``) of a CSV `DataFrame`, reads it, and runs it through `create_postcode_dict_all`. The returned dict is compatible with `get_postcode`.
+"""
+function generate_dict_from_file(filename=FULL_FILE_PROCESSED, cols=[:CouncilArea, :Suburb, :Regionname])
+    return create_postcode_dict_all(select(DataFrame(CSV.File(filename)), :Postcode, cols...) |> dropmissing!, cols)
+end
+
+@debug "Testing arbitrary value for `get_postcode`." beeg_dict=generate_dict_from_file() && get_postcode(beeg_dict, Suburb="Rosanna", CouncilArea="Banyule City Council")
