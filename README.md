@@ -4,7 +4,12 @@ Good evening. My name is Dan Zaikin, and this is [Project 3](https://courses.smp
 
 This code includes both the original and processed data, but should you wish to process your own set, you can do so by running `cleanup.jl` (and editing the global constants as necessary). Note that it includes `info`, `debug`, and `error` messages; you can enable or disable them as per standard Julia fare.
 
-For each task involving charts, `save_plots` happens to be useful for converting a set of plot-generating functions into image files.
+For each task involving charts, `save_plots` (in `task1.jl`) happens to be useful for converting a set of plot-generating functions into image files. As an example, the following snippet will neatly output several graphs from Task 1 as images:
+
+```julia
+    include("task1.jl")
+    save_plots(1, generate_task1_df, plot_funcs=[plot_rooms, plot_price])
+```
 
 ## Task 1
 

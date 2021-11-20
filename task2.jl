@@ -87,5 +87,3 @@ end
 Generates a `DataFrame` from a CSV file for use throughout this task.
 """
 generate_task2_df(filename=FULL_FILE_PROCESSED) = DataFrame(CSV.File(filename))
-
-df_full = generate_task2_df()
