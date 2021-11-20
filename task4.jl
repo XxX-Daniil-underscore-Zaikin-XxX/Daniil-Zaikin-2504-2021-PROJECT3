@@ -63,8 +63,6 @@ end
 @debug "Testing single-value `Dict` creation." create_postcode_dict_for_cols(df_pc, [:Suburb])
 @debug "Testing multi-value `Dict` creation." create_postcode_dict_for_cols(df_pc, [:CouncilArea, :Suburb])
 
-beeg_dict = create_postcode_dict_all(df_pc, [:CouncilArea, :Suburb, :Regionname])
-
 """
     get_postcode(beeg_dict::AbstractDict{AbstractSet, AbstractDict{AbstractSet{String}, AbstractVector{Tuple{Int, Float32}}}};kwargs...)::Vector{Tuple{Int, Float32}}
 
@@ -80,10 +78,11 @@ Set(Col. Names) → Set(Search Data) → Vector of [ Tuples w/ ( ) ]
 ```
 
 """
-function get_postcode(beeg_dict::AbstractDict{AbstractSet, AbstractDict{AbstractSet{String}, AbstractVector{Tuple{Int, Float32}}}};kwargs...)::Vector{Tuple{Int, Float32}}
+function get_postcode(beeg_dict::Dict{Set, Dict{Set{String}, Vector{Tuple{Int, Float32}}}};kwargs...)::Vector{Tuple{Int, Float32}}
     # Takes Vector of Tuples, returns a Vector of only the values in each tuple's tup_ind 
     slice_tuple(tup_vec, tup_ind) = Set(tup[tup_ind] for tup in tup_vec)
-    return collect(beeg_dict[slice_tuple(kwargs, 1)][slice_tuple(kwargs, 2)])
+    col_keys, val_keys = slice_tuple(kwargs, 1), slice_tuple(kwargs, 2)
+    return (val_keys in keys(beeg_dict[col_keys])) ? collect(beeg_dict[col_keys][val_keys]) : []
 end
 
 """
@@ -91,8 +90,8 @@ end
 
 Takes the filename (`String``) of a CSV `DataFrame`, reads it, and runs it through `create_postcode_dict_all`. The returned dict is compatible with `get_postcode`.
 """
-function generate_dict_from_file(filename=FULL_FILE_PROCESSED, cols=[:CouncilArea, :Suburb, :Regionname])
+function generate_task4_dict(filename=FULL_FILE_PROCESSED, cols=[:CouncilArea, :Suburb, :Regionname])
     return create_postcode_dict_all(select(DataFrame(CSV.File(filename)), :Postcode, cols...) |> dropmissing!, cols)
 end
 
-@debug "Testing arbitrary value for `get_postcode`." beeg_dict=generate_dict_from_file() && get_postcode(beeg_dict, Suburb="Rosanna", CouncilArea="Banyule City Council")
+@debug "Testing arbitrary value." get_postcode(generate_task4_dict(), Suburb="Rosannaa", CouncilArea="Banyule City Council")

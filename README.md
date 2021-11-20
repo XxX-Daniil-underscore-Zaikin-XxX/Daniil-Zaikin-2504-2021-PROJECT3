@@ -24,3 +24,42 @@ You can then grab each chart of the task as follows:
     chart4 = plot_method(df_full)
     chart5 = plot_landsize(df_full)
 ```
+
+## Task 2
+
+For Task 2, you must similarly run the following:
+
+```julia
+    include("task2.jl")
+    df_full = generate_task2_df()
+```
+
+If you are using a different file for your data, you can pass its name as a parameter in `generate_task2_df`.
+
+You can then grab each chart of the task as follows:
+
+```julia
+    chart1 = plot_rooms_price(df_full)
+    chart2 = plot_distance_price(df_full)
+    chart3 = plot_rooms_distance_price(df_full)
+```
+
+## Task 4
+
+For Task 4, first run the following:
+
+```julia
+    include("task4.jl")
+    dict = generate_task4_dict()
+```
+
+Should you wish to specify a filename, you can pass its name as a parameter in `generate_task4_dict`.
+
+From here, you can simply pass this dictionary and the necessary parameters to search for the postcode.
+
+```julia
+    postcodes1 = get_postcode(dict, Suburb="Rosanna")
+    postcodes2 = get_postcode(dict, CouncilArea="Banyule City Council")
+    postcodes3 = get_postcode(dict, Suburb="Rosanna", CouncilArea="Banyule City Council")
+    postcodes4 = get_postcode(dict, Suburb="Fart")
+```
